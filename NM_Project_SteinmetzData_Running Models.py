@@ -60,17 +60,26 @@ for i in range(np.size(Feature_Mat['All_feat_name'])):
 #               Train Test Split
 # =============================================================================
 
-# del X, y
+# del X, y, y_train, y_test
+feat_pick =[1,5,9,13,17,21,25,29,33,37,41]  # Visual Only
+# feat_pick =[2,6,10,14,18,22,26,30,34,38,42] # Thala
+feat_pick =[4,8,12,16,20,24,28,32,36,40,44] # Motor
+# feat_pick =[17,21,25,29,37] 
+# X = Feature_Mat['All_feat_cat'][:,feat_pick]
+
+
 X = Feature_Mat['All_feat_cat'][:,0:-2]
-# X = Feature_Mat['All_feat_cat'][:,0:-2]
 y= Feature_Mat['All_feat_cat'][:,-1]
 
 print(f"Shape of X mat: {X.shape}")
 print(f"Shape of Y mat: {y.shape}")
-
+indx=[y!=-2]
+# y= y[indx]
+# X =X[indx]
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=0)
+
 
 
 
@@ -80,7 +89,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 # =============================================================================
 
 
-clf = svm.SVC(kernel='rbf', C=0.75)
+clf = svm.SVC(kernel='rbf', C=1)
 scores = cross_val_score(clf, X, y, cv=10)
 scores
 
@@ -95,7 +104,7 @@ print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
 
 
 #print(taskname)
-num_iteration=3
+num_iteration=100
 from sklearn.pipeline import make_pipeline
 import csv
 import os
@@ -112,6 +121,23 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 import matplotlib.pyplot as plt
 import pandas as pd
 
+import random as rn
+from sklearn.model_selection import GridSearchCV 
+
+
+# param_grid = {'C': [0.1, 1, 10, 100, 1000],  
+#               'gamma': [1, 0.1, 0.01, 0.001, 0.0001], 
+#               'kernel': ['rbf']}  
+
+# grid = GridSearchCV(SVC(), param_grid, refit = True, verbose = 3) 
+# grid = make_pipeline(preprocessing.StandardScaler(),svm.SVC())
+
+# grid.fit(X_train, y_train) 
+
+# grid_predictions = grid.predict(X_test) 
+# print(classification_report(y_test, grid_predictions)) 
+
+
 
 
 p_task_svm = 0
@@ -119,7 +145,7 @@ acc_list_task = []
 std_list_task = []
 taskname='Random'
 for iteration in range(num_iteration):
-    cv = ShuffleSplit(n_splits=4, test_size=0.25, random_state= None)
+    cv = ShuffleSplit(n_splits=4, test_size=0.25, random_state= 1)
     clf = make_pipeline(preprocessing.StandardScaler(), svm.SVC(C=1, kernel = 'rbf'))
     scores1 = cross_val_score(clf, X_train, y_train, cv=cv)
 
@@ -134,6 +160,38 @@ print(acc_list_task)
 print(f"Mean accuracy over iterations:{np.round(np.mean(acc_list_task),3)}% (+/- {np.round(np.std(acc_list_task),3)})")
 
 
+
+### Shuffle the targets 
+
+# y_train_shuffle = y_train
+
+# np.random.shuffle(y_train_shuffle)
+
+# AA=rn.sample(list(y_train), len(list(y_train)))
+p_task_svm = 0
+acc_list_task = []
+std_list_task = []
+taskname='Random'
+for iteration in range(num_iteration):
+    cv = ShuffleSplit(n_splits=4, test_size=0.25, random_state= 1)
+    clf = make_pipeline(preprocessing.StandardScaler(), svm.SVC(C=1, kernel = 'rbf'))
+    scores1 = cross_val_score(clf, X_train,rn.sample(list(y_train), len(list(y_train))), cv=cv)
+
+    print("Accuracy: %0.3f (+/- %0.3f)" % (scores1.mean(), scores1.std()))
+    p_task_svm = scores1.mean() + p_task_svm
+
+    acc_list_task.append(scores1.mean()*100)
+    std_list_task.append(scores1.std() * 100)
+
+print(" \n Score total " + taskname +" using SVM: " + repr(p_task_svm/num_iteration) )  
+print(acc_list_task)
+print(f"Mean accuracy over iterations:{np.round(np.mean(acc_list_task),3)}% (+/- {np.round(np.std(acc_list_task),3)})")
+
+
+
+
+
+
 # =============================================================================
 #                   Decision Tree Classsifier
 # =============================================================================
@@ -145,7 +203,7 @@ acc_list_task = []
 std_list_task = []
 taskname='Random'
 for iteration in range(num_iteration):
-    cv = ShuffleSplit(n_splits=4, test_size=0.25, random_state= None)
+    cv = ShuffleSplit(n_splits=3, test_size=0.25, random_state= 1)
     clf = make_pipeline(preprocessing.StandardScaler(), DecisionTreeClassifier())
     scores1 = cross_val_score(clf, X_train, y_train, cv=cv)
 
@@ -159,6 +217,35 @@ print(" \n Score total " + taskname +" using SVM: " + repr(p_task_svm/num_iterat
 print(acc_list_task)
 print(f"Mean accuracy over iterations:{np.round(np.mean(acc_list_task),3)}% (+/- {np.round(np.std(acc_list_task),3)})")
 
+
+
+
+
+
+### Shuffle the targets 
+
+p_task_svm = 0
+acc_list_task = []
+std_list_task = []
+taskname='Random'
+for iteration in range(num_iteration):
+    cv = ShuffleSplit(n_splits=3, test_size=0.25, random_state=1)
+    clf = make_pipeline(preprocessing.StandardScaler(), DecisionTreeClassifier())
+    scores1 = cross_val_score(clf, X_train, rn.sample(list(y_train), len(list(y_train))), cv=cv)
+
+    print("Accuracy: %0.3f (+/- %0.3f)" % (scores1.mean(), scores1.std()))
+    p_task_svm = scores1.mean() + p_task_svm
+
+    acc_list_task.append(scores1.mean()*100)
+    std_list_task.append(scores1.std() * 100)
+
+print(" \n Score total " + taskname +" using SVM: " + repr(p_task_svm/num_iteration) )  
+print(acc_list_task)
+print(f"Mean accuracy over iterations:{np.round(np.mean(acc_list_task),3)}% (+/- {np.round(np.std(acc_list_task),3)})")
+
+
+
+
 # =============================================================================
 #                   Random Forest Classifier
 # =============================================================================
@@ -170,11 +257,33 @@ acc_list_task = []
 std_list_task = []
 taskname='Random'
 for iteration in range(num_iteration):
-    cv = ShuffleSplit(n_splits=4, test_size=0.25, random_state= None)
+    cv = ShuffleSplit(n_splits=4, test_size=0.25, random_state=1)
     clf = make_pipeline(preprocessing.StandardScaler(), RandomForestClassifier())
     scores1 = cross_val_score(clf, X_train, y_train, cv=cv)
 
-    # print("Accuracy: %0.3f (+/- %0.3f)" % (scores1.mean(), scores1.std()))
+    print("Accuracy: %0.3f (+/- %0.3f)" % (scores1.mean(), scores1.std()))
+    p_task_svm = scores1.mean() + p_task_svm
+
+    acc_list_task.append(scores1.mean()*100)
+    std_list_task.append(scores1.std() * 100)
+
+print(" \n Score total " + taskname +" using SVM: " + repr(p_task_svm/num_iteration) )  
+print(acc_list_task)
+print(f"Mean accuracy over iterations:{np.round(np.mean(acc_list_task),3)}% (+/- {np.round(np.std(acc_list_task),3)})")
+
+
+
+
+p_task_svm = 0
+acc_list_task = []
+std_list_task = []
+taskname='Random'
+for iteration in range(num_iteration):
+    cv = ShuffleSplit(n_splits=4, test_size=0.25, random_state=1)
+    clf = make_pipeline(preprocessing.StandardScaler(), RandomForestClassifier())
+    scores1 = cross_val_score(clf, X_train, rn.sample(list(y_train), len(list(y_train))), cv=cv)
+
+    print("Accuracy: %0.3f (+/- %0.3f)" % (scores1.mean(), scores1.std()))
     p_task_svm = scores1.mean() + p_task_svm
 
     acc_list_task.append(scores1.mean()*100)
@@ -191,13 +300,18 @@ print(f"Mean accuracy over iterations:{np.round(np.mean(acc_list_task),3)}% (+/-
 
 from sklearn.ensemble import  AdaBoostClassifier
 
+
+clf = AdaBoostClassifier(n_estimators=3)
+scores = cross_val_score(clf, X, y, cv=5)
+scores.mean()
+
 p_task_svm = 0
 acc_list_task = []
 std_list_task = []
 taskname='Random'
 for iteration in range(num_iteration):
-    cv = ShuffleSplit(n_splits=4, test_size=0.25, random_state= None)
-    clf = make_pipeline(preprocessing.StandardScaler(), AdaBoostClassifier( DecisionTreeClassifier(max_depth=12),
+    cv = ShuffleSplit(n_splits=4, test_size=0.25, random_state= 1)
+    clf = make_pipeline(preprocessing.StandardScaler(), AdaBoostClassifier( DecisionTreeClassifier(),
     n_estimators=600,))
     scores1 = cross_val_score(clf, X_train, y_train, cv=cv)
 
@@ -212,6 +326,42 @@ print(acc_list_task)
 print(f"Mean accuracy over iterations:{np.round(np.mean(acc_list_task),3)}% (+/- {np.round(np.std(acc_list_task),3)})")
 
 
+
+
+### Shuffle the targets 
+
+clf = AdaBoostClassifier(n_estimators=3)
+scores = cross_val_score(clf, X, y, cv=5)
+scores.mean()
+
+p_task_svm = 0
+acc_list_task = []
+std_list_task = []
+taskname='Random'
+for iteration in range(num_iteration):
+    cv = ShuffleSplit(n_splits=4, test_size=0.25, random_state=1)
+    clf = make_pipeline(preprocessing.StandardScaler(), AdaBoostClassifier( DecisionTreeClassifier(),
+    n_estimators=600,))
+    scores1 = cross_val_score(clf, X_train, rn.sample(list(y_train), len(list(y_train))), cv=cv)
+
+    # print("Accuracy: %0.3f (+/- %0.3f)" % (scores1.mean(), scores1.std()))
+    p_task_svm = scores1.mean() + p_task_svm
+
+    acc_list_task.append(scores1.mean()*100)
+    std_list_task.append(scores1.std() * 100)
+
+print(" \n Score total " + taskname +" using SVM: " + repr(p_task_svm/num_iteration) )  
+print(acc_list_task)
+print(f"Mean accuracy over iterations:{np.round(np.mean(acc_list_task),3)}% (+/- {np.round(np.std(acc_list_task),3)})")
+
+
+
+
+
+
+
+
+
 # =============================================================================
 #                         Multi-layer perceptron (MLP) 
 # =============================================================================
@@ -223,10 +373,10 @@ acc_list_task = []
 std_list_task = []
 taskname='Random'
 for iteration in range(num_iteration):
-    cv = ShuffleSplit(n_splits=4, test_size=0.25, random_state= None)
+    cv = ShuffleSplit(n_splits=4, test_size=0.25, random_state= 1)
     clf = make_pipeline(preprocessing.StandardScaler(),
-                        MLPClassifier(solver='lbfgs', alpha=1e-5,
-                        hidden_layer_sizes=(5,2), random_state=1))
+                        MLPClassifier(solver='adam', alpha=1e-5,max_iter=900,
+                        hidden_layer_sizes=(5,4), random_state=1))
     scores1 = cross_val_score(clf, X_train, y_train, cv=cv)
 
     # print("Accuracy: %0.3f (+/- %0.3f)" % (scores1.mean(), scores1.std()))
@@ -257,7 +407,7 @@ clf.fit(X, y)
 # =============================================================================
 
 
-y_train = to_categorical(y_train)
+
 
 
 # Keras specific
@@ -266,22 +416,68 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.utils import to_categorical 
 from keras.layers import Dropout
+from keras.utils import normalize
+
+
+y_train_deep = to_categorical(y_train,num_classes=4)
+y_test_deep = to_categorical(y_test,num_classes=4)
+
+X_train_deep = normalize(X_train, axis=1)
+X_test_deep = normalize(X_test, axis=1)
 
 
 
 model = Sequential()
-model.add(Dense(500, activation='relu', input_dim=32))
-model.add(Dropout(0.2))
-model.add(Dense(100, activation='relu'))
-model.add(Dropout(0.2))
-model.add(Dense(70, activation='relu'))
-model.add(Dropout(0.2))
-model.add(Dense(50, activation='relu'))
-model.add(Dropout(0.2))
-model.add(Dense(20, activation='relu'))
-model.add(Dropout(0.2))
+model.add(Dense(6000, activation='relu', input_dim=len(X_train[0,:])))
+model.add(Dropout(0.5))
+# model.add(Dense(80, activation='relu'))
+# model.add(Dropout(0.5))
+# model.add(Dense(70, activation='relu'))
+# model.add(Dropout(0.5))
+# model.add(Dense(5000, activation='relu'))
+# model.add(Dropout(0.5))
+# model.add(Dense(500, activation='relu'))
+# model.add(Dropout(0.5))
+# model.add(Dense(500, activation='relu'))
+# model.add(Dropout(0.5))
+# model.add(Dense(500, activation='relu'))
+# model.add(Dropout(0.5))
+# model.add(Dense(500, activation='relu'))
+# model.add(Dropout(0.5))
+# model.add(Dense(500, activation='relu'))
+# model.add(Dropout(0.5))
+model.add(Dense(4000, activation='relu'))
+model.add(Dropout(0.5))
+# model.add(Dense(20, activation='relu'))
+# model.add(Dropout(0.5))
+# model.add(Dense(4000, activation='relu'))
+# model.add(Dropout(0.5))
 
-model.add(Dense(2, activation="softmax"))
+model.add(Dense(1000, activation='relu'))
+model.add(Dropout(0.5))
+
+# model.add(Dense(500, activation='relu'))
+# model.add(Dropout(0.5))
+
+# model.add(Dense(500, activation='relu'))
+# model.add(Dropout(0.5))
+
+# model.add(Dense(500, activation='relu'))
+# model.add(Dropout(0.5))
+
+# model.add(Dense(50, activation='relu'))
+# model.add(Dropout(0.5))
+
+# model.add(Dense(25, activation='relu'))
+# model.add(Dropout(0.5))
+
+# model.add(Dense(100, activation='relu'))
+# model.add(Dropout(0.5))
+
+# model.add(Dense(10, activation='relu'))
+# model.add(Dropout(0.5))
+
+model.add(Dense(4, activation="softmax"))
 
 # Compile the model
 model.compile(optimizer='adam', 
@@ -290,16 +486,20 @@ model.compile(optimizer='adam',
 
 
 # build the model
-history = model.fit(X_train, y_train, epochs=50)
+history = model.fit(X_train_deep, y_train_deep, validation_data=(X_test_deep,y_test_deep), epochs=150)
 
 
-pred_train= model.predict(X_train)
-scores = model.evaluate(X_train, y_train, verbose=0)
+pred_train= model.predict(X_train_deep)
+scores = model.evaluate(X_train_deep,y_train_deep, verbose=0)
+print('Accuracy on training data: {}% \n Error on training data: {}'.format(scores[1], 1 - scores[1]))   
+ 
+scores = model.evaluate(X_train_deep,y_train_deep, verbose=0)
 print('Accuracy on training data: {}% \n Error on training data: {}'.format(scores[1], 1 - scores[1]))   
  
 
-
-
+# =============================================================================
+# 
+# =============================================================================
 
 
 import matplotlib.pyplot as plt

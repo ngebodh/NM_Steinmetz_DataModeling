@@ -724,7 +724,7 @@ if pull_out_feat==1
 
 clear datin_all lfp_ampl_late lfp_ampl_early lfp_laten_early lfp_laten_late...
     lfp_cum_sum  spks_ampl_early spks_laten_early spks_ampl_late  spks_laten_late...
-    mouse_resp_time_postcue mouse_resp_cat spks_cum_sum lfp_cum_sum Per_power spks_ampl_late spks_laten_late
+    mouse_resp_time_postcue mouse_resp_cat spks_cum_sum lfp_cum_sum Per_power
 
 w = gausswin(8); 
 tpts_lfp={[5:25]+50; [15:38]+50}; %LFP time chunks to look for peak
@@ -790,7 +790,7 @@ if  dat_type==1
     
     %Info for LFP
     
-%     figure; 
+    figure; 
     for pc=1:size(score,2)
             
             %Loop over brain areas (NOT PCS) and pull out the cumulative
@@ -809,24 +809,24 @@ if  dat_type==1
                 clear sig_in pkss; 
 %                 sig_in=filtfilt(w, 1, sqrt(score(tpts_lfp{tt},pc).^2));
 
-                sig_in=sqrt(score(tpts_lfp{tt},pc).^2);
-                
+%                 sig_in=sqrt(score(tpts_lfp{tt},pc).^2);
+%                 
 %                plot(tpts_lfp{tt},sig_in,'m');
 %                 hold on
 
-%                 if tt==1, clr=[0.9 .3 .1], else,  clr=[0.2 .6 .1], end    
-%                 sig_in= -1*sqrt(diff(score(tpts_lfp{tt},1)).^2);%sqrt(score(tpts_spks{tt},pc).^2);  
-%                 
-%                 
-%                 plot(tpts_lfp{tt}(1:end-1),sig_in,'color',clr,'linewidth', 3);
-%                 hold on
-%                 
-%                 
+                if tt==1, clr=[0.9 .3 .1], else,  clr=[0.2 .6 .1], end    
+                sig_in= -1*sqrt(diff(score(tpts_lfp{tt},1)).^2);%sqrt(score(tpts_spks{tt},pc).^2);  
+                
+                
+                plot(tpts_lfp{tt}(1:end-1),sig_in,'color',clr,'linewidth', 3);
+                hold on
+                
+                
                 
                 [pkss, locs]= findpeaks( sig_in ,tpts_lfp{tt} ,...
                     'MinPeakWidth',2.5,'Annotate','extents');
-                if ~isempty(locs) && length(locs)>1,
-                    [~,mx_indd]=max(pkss);
+                if length(locs)>1,
+                    [~,mx_indd]=max(pkss)
                     nnn=mx_indd; 
                 else
                     nnn=1; 
@@ -857,35 +857,35 @@ if  dat_type==1
 %             plot(sig_in);
 %             hold on
             
-%             plot(score(:,pc))
-%             hold on
-%             plot(datin_all(:,pc)); 
-%             hold on
-%             plot(lfp_laten_early(trl,pc), lfp_ampl_early(trl,pc),'*g')
-%             hold on
-%             plot(lfp_laten_late(trl,pc), lfp_ampl_late(trl,pc),'*r')
+            plot(score(:,pc))
+            hold on
+            plot(datin_all(:,pc)); 
+            hold on
+            plot(lfp_laten_early(trl,pc), lfp_ampl_early(trl,pc),'*g')
+            hold on
+            plot(lfp_laten_late(trl,pc), lfp_ampl_late(trl,pc),'*r')
             
 
             
             
     end 
     
-%             fname =['SingleTrial','_', alldat.mouse_name(1:3),'_',alldat.date_exp,'_DatTyp_', num2str(dat_type), '_Trial_', num2str(trl)];
-%             hh=gcf;
-%             set(hh,'name',fname,'Position',[ 643   148   822   418])
-%              if SveAllpics==1
-%                    h = gcf;
-%                    saveas(h,strcat(prefix,fname,'.fig'),'fig');
-%                    saveas(h,strcat(prefix,fname,'.png'),'png');
-%                    print(h,'-dpng', [prefix,fname], '-r600');
-%                    print(h,'-depsc', [prefix,fname], '-r600');
-%                end
-%              if closefigs==1, close all,  end 
+            fname =['SingleTrial','_', alldat.mouse_name(1:3),'_',alldat.date_exp,'_DatTyp_', num2str(dat_type), '_Trial_', num2str(trl)];
+            hh=gcf;
+            set(hh,'name',fname,'Position',[ 643   148   822   418])
+             if SveAllpics==1
+                   h = gcf;
+                   saveas(h,strcat(prefix,fname,'.fig'),'fig');
+                   saveas(h,strcat(prefix,fname,'.png'),'png');
+                   print(h,'-dpng', [prefix,fname], '-r600');
+                   print(h,'-depsc', [prefix,fname], '-r600');
+               end
+             if closefigs==1, close all,  end 
 
 
 else
 %Info for Spikes 
-%     figure; 
+    figure; 
     for pc=1:size(score,2)
             
             %Loop over brain areas (NOT PCS) and pull out the cumulative
@@ -896,27 +896,24 @@ else
             for tt=1:size(tpts_spks,1) %index time periods to look at the evoked potentials
                     clear sig_in pkss; 
 %                     sig_in=filtfilt(w, 1, sqrt(score(tpts_spks{tt},pc).^2));
-                if tt==1, clr=[0.9 .3 .1]; else,  clr=[0.2 .6 .1]; end    
+                if tt==1, clr=[0.9 .3 .1], else,  clr=[0.2 .6 .1], end    
                 sig_in= -1*sqrt(diff(score(tpts_spks{tt},1)).^2);%sqrt(score(tpts_spks{tt},pc).^2);  
                 
                 
-%                 plot(tpts_spks{tt}(1:end-1),sig_in,'color',clr,'linewidth', 3);
-%                 hold on
+                plot(tpts_spks{tt}(1:end-1),sig_in,'color',clr,'linewidth', 3);
+                hold on
                 
                 
                 [pkss, locs]= findpeaks( sig_in ,tpts_spks{tt}(1:end-1) ,...
                     'MinPeakWidth',1.5,'Annotate','extents');
 
-                
-                if  ~isempty(locs) && length(locs)>1,
-                    [~,mx_indd]=max(pkss);
-                    nnn=mx_indd;
-                else
-                    nnn=1;
-                end
-                
                 if tt==1 %Early spikes
-
+                if length(locs)>1,
+                    [~,mx_indd]=max(pkss)
+                    nnn=mx_indd; 
+                else
+                    nnn=1; 
+                end  
                     if ~isempty(locs)
                         spks_ampl_early(trl,pc)=score(locs(nnn),pc);
                         spks_laten_early(trl,pc)=locs(nnn);
@@ -939,28 +936,28 @@ else
 
             end
             
-%             plot(score(:,pc))
-%             hold on
-%             plot(datin_all(:,pc)); 
-%             hold on
-%             plot(spks_laten_early(trl,pc), spks_ampl_early(trl,pc),'*g')
-%             hold on
-%             plot(spks_laten_late(trl,pc), spks_ampl_late(trl,pc),'*r')
+            plot(score(:,pc))
+            hold on
+            plot(datin_all(:,pc)); 
+            hold on
+            plot(spks_laten_early(trl,pc), spks_ampl_early(trl,pc),'*g')
+            hold on
+            plot(spks_laten_late(trl,pc), spks_ampl_late(trl,pc),'*r')
        
             
     end 
 
-%             fname =['SingleTrial','_', alldat.mouse_name(1:3),'_',alldat.date_exp,'_DatTyp_', num2str(dat_type), '_Trial_', num2str(trl)];
-%             hh=gcf;
-%             set(hh,'name',fname,'Position',[ 643   148   822   418])
-%              if SveAllpics==1
-%                    h = gcf;
-%                    saveas(h,strcat(prefix,fname,'.fig'),'fig');
-%                    saveas(h,strcat(prefix,fname,'.png'),'png');
-%                    print(h,'-dpng', [prefix,fname], '-r600');
-%                    print(h,'-depsc', [prefix,fname], '-r600');
-%                end
-%              if closefigs==1, close all,  end 
+            fname =['SingleTrial','_', alldat.mouse_name(1:3),'_',alldat.date_exp,'_DatTyp_', num2str(dat_type), '_Trial_', num2str(trl)];
+            hh=gcf;
+            set(hh,'name',fname,'Position',[ 643   148   822   418])
+             if SveAllpics==1
+                   h = gcf;
+                   saveas(h,strcat(prefix,fname,'.fig'),'fig');
+                   saveas(h,strcat(prefix,fname,'.png'),'png');
+                   print(h,'-dpng', [prefix,fname], '-r600');
+                   print(h,'-depsc', [prefix,fname], '-r600');
+               end
+             if closefigs==1, close all,  end 
     
     
     
@@ -988,12 +985,12 @@ All_feat_name={'lfp_ampl_early_PC1','lfp_ampl_early_PC2','lfp_ampl_early_PC3','l
               'spks_cum_sum_PC1','spks_cum_sum_PC2','spks_cum_sum_PC3','spks_cum_sum_PC4',...
               'Percent_bandpower_PC1','Percent_bandpower_PC2','Percent_bandpower_PC3','Percent_bandpower_PC4',...
               'mouse_resp_time_postcue',...
-              'mouse_resp_cat'};
+              'mouse_resp_cat',...};
 clear All_feat         
 All_feat=[lfp_ampl_early,lfp_laten_early,lfp_ampl_late,lfp_laten_late,...
               spks_ampl_early,spks_laten_early,...
-              spks_ampl_late,spks_laten_late,...
-              lfp_cum_sum,spks_cum_sum,...
+              lfp_cum_sum,...
+              spks_cum_sum,...
               Per_power,...
               mouse_resp_time_postcue,...
               mouse_resp_cat];
@@ -1034,3 +1031,133 @@ return
 
 %% JUNK
 
+
+%{
+figure
+patch(score(:,1),score(:,2),score(:,2),'EdgeColor','interp','Marker','o','MarkerFaceColor','flat');
+colorbar;
+      
+%   legend(Brain_group_global(1:3))
+      hold on
+      
+      %Plot trial start
+      line_max=(max(datin)*2);
+      line([0, 0],[-1,1]*line_max,'color','k')
+      
+      
+      %Plot go-cue
+      gocue_t=alldat.gocue(trl)*100;
+      line([1 1]*gocue_t,[-1,1]*line_max,'color','r')
+      
+      %Plot response time
+      resp_t=alldat.response_time(trl)*100;
+      line([1 1]*resp_t,[-1,1]*line_max,'color','m')
+      
+      %Plot response time
+      feedbk_t=alldat.feedback_time(trl)*100;
+      line([1 1]*feedbk_t,[-1,1]*line_max,'color','g')      
+      
+      
+      
+      
+
+      %%_______________________PCA ________________________________________
+      
+      resp_L_cort=logical((alldat.response==1).*(alldat.contrast_right<alldat.contrast_left))
+      resp_No_cort=logical((alldat.response==0).*(alldat.contrast_right==alldat.contrast_left))
+      resp_R_cort=logical((alldat.response==-1).*(alldat.contrast_right>alldat.contrast_left))
+      
+      dat_pca=movmean(squeeze(mean(alldat.lfp(1:12,resp_L_cort,50:end),2))',5)
+      
+      [coeff,score,latent,tsquared,explained,mu] = pca(dat_pca)
+      
+      figure; for ii=1:12, plot(1:length(score), score(:,ii)),hold on; end
+      
+      figure
+      for ii=1:12
+      [pxx, ff]=pwelch(score(:,ii), [],[],[],100)
+      plot(ff,db(pxx))
+      hold on
+      end 
+      
+      figure; bar(explained)
+      
+      
+  figure; 
+ for ii=1:3, 
+     plot(trial_t,squeeze(mean(alldat.pupil(ii,:,:),2))), 
+     hold on, 
+ end
+
+
+figure; 
+for ii=1:4
+plot(trial_t,score(:,ii))
+hold on
+end 
+
+
+
+
+
+w = gausswin(7); 
+figure; 
+plot(score(tpts_lfp{tm_period}+50,1))
+hold on
+plot(sqrt(score(tpts_lfp{tm_period}+50,1).^2))
+hold on
+plot(filtfilt(w, 1,sqrt(score(tpts_lfp{tm_period}+50,1).^2)))
+hold on
+plot(filter(w, 1,sqrt(score(tpts_lfp{tm_period}+50,1).^2)))
+
+findpeaks(filter(w, 1,sqrt(score(tpts_lfp{tm_period}+50,1).^2)),'MinPeakWidth',3,'Annotate','extents')
+
+
+
+
+
+C = jet(length(squeeze(All_PC_scores(nn,1,:))))%[0 .9 .75; 1 0 0; 0 0.4 0.4; 0.6 0.4 0];
+clr=[jet(4)];
+tt=[50]
+figure;
+for nn=1:4 
+    scatter3(max(squeeze(All_PC_scores(nn,1,50:end))),max(squeeze(All_PC_scores(nn,2,50:end))),max(squeeze(All_PC_scores(nn,3,50:end))),[],'MarkerEdgeColor',[clr(nn,:)]); 
+    hold on; 
+end 
+
+
+
+
+
+
+
+clear datinR_spks datinL_spks datinNo_spks datinWr_spks ...
+      datinR_lfp datinL_lfp datinNo_lfp datinWr_lfp
+
+for ii=1:4 %Loop over brain area
+  datinR_spks(:,ii)=movmean((1/0.01)*squeeze(mean(alldat.spks(Brain_areas_match_spks{ii},resp_R_cort,:),1)),5);
+  datinL_spks(:,ii)=movmean((1/0.01)*squeeze(mean(alldat.spks(Brain_areas_match_spks{ii},resp_L_cort,:),1)),5);
+  datinNo_spks(:,ii)=movmean((1/0.01)*squeeze(mean(alldat.spks(Brain_areas_match_spks{ii},resp_No_cort,:),1)),5);
+  datinWr_spks(:,ii)=movmean((1/0.01)*squeeze(mean(alldat.spks(Brain_areas_match_spks{ii},resp_Al_wrong,:),1)),5);    
+  
+  
+  datinR_lfp(:,ii)=movmean(squeeze(mean(alldat.lfp(Brain_areas_match_lfp{ii},resp_R_cort,:),1)),5);
+  datinL_lfp(:,ii)=movmean(squeeze(mean(alldat.lfp(Brain_areas_match_lfp{ii},resp_L_cort,:),1)),5);
+  datinNo_lfp(:,ii)=movmean(squeeze(mean(alldat.lfp(Brain_areas_match_lfp{ii},resp_No_cort,:),1)),5);
+  datinWr_lfp(:,ii)=movmean(squeeze(mean(alldat.lfp(Brain_areas_match_lfp{ii},resp_Al_wrong,:),1)),5);   
+  
+end 
+
+
+figure;hold on
+trl=1
+plot(Test(trl,:))
+
+[num, ind]=max(Test(trl,50:50+20))
+plot(ind+49, num,'r*')
+
+[num2, ind2]=max(Test(trl,50+20:50+50))
+plot(ind2+(49+20), num2,'r*')
+
+
+%}
