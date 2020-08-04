@@ -60,16 +60,20 @@ for i in range(np.size(Feature_Mat['All_feat_name'])):
 #               Train Test Split
 # =============================================================================
 
-# del X, y, y_train, y_test
-feat_pick =[1,5,9,13,17,21,25,29,33,37,41]  # Visual Only
+del X, y, y_train, y_test
+# feat_pick =[1,5,9,13,17,21,25,29,33,37,41]  # Visual Only
 # feat_pick =[2,6,10,14,18,22,26,30,34,38,42] # Thala
-feat_pick =[4,8,12,16,20,24,28,32,36,40,44] # Motor
+# feat_pick =[3,7,11,15,19,23,27,31,35,39,43] # Hippo
+# feat_pick =[4,8,12,16,20,24,28,32,36,40,44] # Motor
 # feat_pick =[17,21,25,29,37] 
-# X = Feature_Mat['All_feat_cat'][:,feat_pick]
+
+feat_pick =[4,8,12,16,20,24,28,32,36,40,44]+[3,7,11,15,19,23,27,31,35,39,43] #Motor and Hippo
+
+X = Feature_Mat['All_feat_cat'][0:300,feat_pick]
 
 
-X = Feature_Mat['All_feat_cat'][:,0:-2]
-y= Feature_Mat['All_feat_cat'][:,-1]
+# X = Feature_Mat['All_feat_cat'][:,0:-2]
+y= Feature_Mat['All_feat_cat'][0:300,-1]
 
 print(f"Shape of X mat: {X.shape}")
 print(f"Shape of Y mat: {y.shape}")
@@ -493,7 +497,7 @@ pred_train= model.predict(X_train_deep)
 scores = model.evaluate(X_train_deep,y_train_deep, verbose=0)
 print('Accuracy on training data: {}% \n Error on training data: {}'.format(scores[1], 1 - scores[1]))   
  
-scores = model.evaluate(X_train_deep,y_train_deep, verbose=0)
+scores = model.evaluate(X_test_deep,y_test_deep, verbose=0)
 print('Accuracy on training data: {}% \n Error on training data: {}'.format(scores[1], 1 - scores[1]))   
  
 
